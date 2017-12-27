@@ -7,7 +7,7 @@ const ObjectID = require('mongodb').ObjectID;
 var {mongoose} = require('./db/mongoose');
 var {Item} = require('./models/item');
 var {User} = require('./models/user');
-
+var {authenticate} = require('./middleware/authenticate');
 var app = express();
 const port = process.env.PORT;
 
@@ -97,18 +97,8 @@ app.patch('/items/:id', (req, res) => {
 });
 
 
-app.get('/users/me',(req,res)=>{
-
-  var token = req.header('x-auth');
-  User.findByToken(token).then((user)=>{
-    if(!user){
-      return Promise.reject();
-    }
-    res.send(user);
-  }).catch((e)=>{
-    console.log('ERR: '+e);
-    res.status(401).send();
-  });
+app.get('/users/me',authenticate,(req,res)=>{
+  res.send(req.user);
 });
 
 // POST /users
