@@ -60,6 +60,25 @@ UserSchema.methods.toJSON = function(){
   return _.pick(user,['_id','email'])
 }
 
+
+UserSchema.statics.findByToken = function(token){
+    var User = this;
+    var decoded;
+
+    try{
+      decoded = jwt.verify(token,'secretABC');
+    }catch(e){
+      console.log('JWT verification failed!');
+      return Promise.reject();
+    }
+
+    return User.findOne({
+      '_id': decoded._id,
+      'tokens.access': 'auth',
+      'tokens.token': token
+    });
+}
+
 var User = mongoose.model('User', UserSchema );
 
 module.exports = {User}

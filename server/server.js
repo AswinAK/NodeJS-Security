@@ -96,6 +96,21 @@ app.patch('/items/:id', (req, res) => {
   })
 });
 
+
+app.get('/users/me',(req,res)=>{
+
+  var token = req.header('x-auth');
+  User.findByToken(token).then((user)=>{
+    if(!user){
+      return Promise.reject();
+    }
+    res.send(user);
+  }).catch((e)=>{
+    console.log('ERR: '+e);
+    res.status(401).send();
+  });
+});
+
 // POST /users
 app.post('/users', (req, res) => {
   var body = _.pick(req.body, ['name','email', 'password','location']);
@@ -108,7 +123,6 @@ app.post('/users', (req, res) => {
      res.header('x-auth',token).send(user);
   })
   .catch((e) => {
-    console.log('error '+e);
     res.status(400).send(e);
   })
 });
