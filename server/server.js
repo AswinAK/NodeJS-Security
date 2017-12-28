@@ -36,14 +36,17 @@ app.get('/items',authenticate, (req, res) => {
   });
 });
 
-app.get('/items/:id', (req, res) => {
+app.get('/items/:id',authenticate, (req, res) => {
   var id = req.params.id;
 
   if (!ObjectID.isValid(id)) {
     return res.status(404).send();
   }
 
-  Item.findById(id).then((item) => {
+  Item.findOne({
+    dreamer: req.user._id,
+    _id: id
+  }).then((item) => {
     if (!item) {
       return res.status(404).send();
     }
@@ -54,14 +57,17 @@ app.get('/items/:id', (req, res) => {
   });
 });
 
-app.delete('/items/:id', (req, res) => {
+app.delete('/items/:id', authenticate ,(req, res) => {
   var id = req.params.id;
 
   if (!ObjectID.isValid(id)) {
     return res.status(404).send();
   }
 
-  Item.findByIdAndRemove(id).then((item) => {
+  Item.findOneAndRemove({
+    _id:id,
+    dreamer: req.user._id
+  }).then((item) => {
     if (!item) {
       return res.status(404).send();
     }
@@ -71,7 +77,7 @@ app.delete('/items/:id', (req, res) => {
   });
 });
 
-app.patch('/items/:id', (req, res) => {
+app.patch('/items/:id', authenticate,(req, res) => {
   var id = req.params.id;
   var body = _.pick(req.body, ['name', 'acquired','price']);
 
@@ -86,7 +92,10 @@ app.patch('/items/:id', (req, res) => {
     body.acquiredAt = null;
   }
 
-  Item.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
+  Item.findByIdAndUpdate({
+    _id:id,
+    dreamer: req.user._id
+  }, {$set: body}, {new: true}).then((todo) => {
     if (!todo) {
       return res.status(404).send();
     }
