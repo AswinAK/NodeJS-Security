@@ -17,6 +17,10 @@ var Item = mongoose.model('Item', {
   acquiredOn: {
     type: Number,
     default: null
+  },
+  dreamer:{
+    type: mongoose.Schema.Types.ObjectId,
+    required: true
   }
 });
 
