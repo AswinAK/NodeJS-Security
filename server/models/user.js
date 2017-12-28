@@ -61,9 +61,9 @@ UserSchema.methods.toJSON = function(){
   return _.pick(user,['_id','email'])
 }
 
-UserSchema.methods.removeToken() = function(token){
+UserSchema.methods.removeToken = function(token){
   var user = this;
-  user.update({
+  return user.update({
     $pull: {tokens:{token}}}
   );
 }
@@ -100,6 +100,7 @@ UserSchema.statics.findByCredentials = function(email,password){
           if(res){
             result(user);
           }else{
+            console.log('not able to get user with given credentials');
             reject();
           }
         });

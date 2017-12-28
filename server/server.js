@@ -13,11 +13,12 @@ const port = process.env.PORT;
 
 app.use(bodyParser.json());
 
-app.post('/item', (req, res) => {
+app.post('/item', authenticate,(req, res) => {
   var item = new Item({
     name: req.body.name,
     price: req.body.price,
-    acquired:false
+    acquired:false,
+    dreamer: req.user._id
   });
 
   item.save().then((doc) => {
@@ -27,8 +28,8 @@ app.post('/item', (req, res) => {
   });
 });
 
-app.get('/items', (req, res) => {
-  Item.find().then((items) => {
+app.get('/items',authenticate, (req, res) => {
+  Item.find({dreamer: req.user._id}).then((items) => {
     res.send({items});
   }, (e) => {
     res.status(400).send(e);
@@ -127,7 +128,7 @@ app.post('/users/login',(req,res)=>{
 });
 
 app.delete('/users/me/logout', authenticate, (req,res)=>{
-  req.user.removeToken(req.token).then((res)=>{
+  req.user.removeToken(req.token).then(()=>{
     res.status(200).send();
   },
   (err)=>{
