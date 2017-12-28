@@ -123,6 +123,7 @@ app.post('/users', (req, res) => {
      res.header('x-auth',token).send(user);
   })
   .catch((e) => {
+    console.log('not able to save ',e);
     res.status(400).send(e);
   })
 });
